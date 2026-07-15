@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>criaagentes — um agente de WhatsApp para clínica, em 6 camadas</title>
+<meta name="description" content="Um agentic OS completo para o atendente de WhatsApp de uma clínica odontológica: identidade, substrato, regras, skills, ferramentas e agente. Construído camada por camada com o OS Coach.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c10; --bg2:#14141b; --card:#16161e; --line:#272730;
+    --txt:#e9e9ee; --mut:#9a9aa6; --amb:#E2A23B; --amb2:#f0c070; --sky:#38bdf8; --pro:#cbd5e1;
+    color-scheme:dark;
+  }
+  body.light{
+    --bg:#f6f7f9; --bg2:#eceef2; --card:#ffffff; --line:#e1e3ea;
+    --txt:#1a1a22; --mut:#5b5b68; --amb:#b9791d; --amb2:#a16207; --sky:#0369a1; --pro:#b45309;
+    color-scheme:light;
+  }
+  body.light .hero .glow{opacity:.5}
+  body.light pre{background:#0e0e14;color:#d6d6e0}
+  body.light pre .c{color:#8a8a98}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Sora,sans-serif;line-height:1.15;margin:0}
+  a{color:var(--amb);text-decoration:none}
+  code,pre{font-family:"JetBrains Mono",monospace}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  .mut{color:var(--mut)} .amb{color:var(--amb)}
+  .chip{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);font-weight:600;font-family:Sora}
+  nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(12,12,16,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+  nav .brand{display:flex;align-items:center;gap:8px;font-family:Sora;font-weight:800;letter-spacing:-.02em;color:var(--amb)}
+  nav .brand .emoji{font-size:1.25rem}
+  nav .sep{color:var(--mut);opacity:.45}
+  nav .inema{color:var(--sky);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .inema:hover{filter:brightness(1.15)}
+  nav .pro{color:var(--pro);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .pro:hover{filter:brightness(1.15)}
+  nav .clubpro{display:inline-flex;align-items:center;gap:6px}
+  nav .links{margin-left:auto;display:flex;align-items:center;gap:20px;font-size:.92rem}
+  nav .links a.sec{color:var(--mut)} nav .links a.sec:hover{color:var(--txt)}
+  .tgl{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .tgl:hover{border-color:var(--amb)}
+  .btn{display:inline-block;background:var(--amb);color:#1a1206;font-weight:600;padding:.6em 1.05em;border-radius:10px;font-family:Sora}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  @media(max-width:760px){nav .links a.sec{display:none}}
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero .glow{position:absolute;inset:-40% -20% auto auto;width:70%;height:600px;background:radial-gradient(closest-side,rgba(226,162,59,.22),transparent 70%);pointer-events:none}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:74px 22px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;letter-spacing:-.025em}
+  .hero p.lead{font-size:1.18rem;color:var(--mut);margin:1.1em 0 1.6em;max-width:34ch}
+  .hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .hero figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000}
+  .hero figure img{width:100%;display:block}
+  @media(max-width:780px){.hero .wrap{grid-template-columns:1fr;padding:48px 22px}}
+  section{padding:62px 0;border-bottom:1px solid var(--line)}
+  section h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+  section .sub{color:var(--mut);margin:.6em 0 2em;max-width:62ch}
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:820px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:1.05rem;margin-bottom:.4em}
+  .card p{color:var(--mut);font-size:.92rem;margin:0}
+  .num{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:rgba(226,162,59,.14);color:var(--amb);font-family:Sora;font-weight:800;font-size:.9rem;margin-bottom:.7em}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .flow span{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:.45em .9em;font-size:.85rem;font-family:Sora;font-weight:600}
+  .flow .arr{color:var(--amb);border:none;background:none;padding:0 .1em}
+  pre{background:#0a0a0e;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;font-size:.86rem;line-height:1.6;color:#d6d6e0}
+  pre .c{color:#6f6f7c} pre .k{color:var(--amb2)} pre .s{color:#9ece6a}
+  .step{display:grid;grid-template-columns:46px 1fr;gap:16px;margin-bottom:26px}
+  .step .b{width:46px;height:46px;border-radius:12px;background:var(--amb);color:#1a1206;font-family:Sora;font-weight:800;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+  .step h3{font-size:1.12rem;margin-bottom:.3em}
+  .step p{color:var(--mut);margin:.2em 0 .7em}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.ex{grid-template-columns:1fr}}
+  .ex figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .ex figure img{width:100%;display:block}
+  .ex figcaption{padding:12px 14px;font-size:.88rem;color:var(--mut);background:var(--card)}
+  .phase{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .phase:last-child{border:none}
+  .phase .tag{flex:0 0 92px;font-family:Sora;font-weight:800;color:var(--amb)}
+  .phase .d strong{display:block;margin-bottom:.2em}
+  .phase .d span{color:var(--mut);font-size:.92rem}
+  footer{padding:46px 0;text-align:center;color:var(--mut);font-size:.9rem}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.3em .8em;font-size:.78rem;color:var(--mut);margin:0 4px}
+  .chat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;font-size:.92rem}
+  .chat .msg{margin-bottom:12px}
+  .chat .who{font-family:Sora;font-weight:600;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:.25em}
+  .chat .bot .who{color:var(--amb)}
+  .chat .alert{border-left:2px solid var(--amb);padding-left:12px;color:var(--mut);font-size:.86rem}
+  .warn{background:rgba(226,162,59,.09);border:1px solid var(--amb);border-radius:14px;padding:18px 20px}
+  .warn strong{color:var(--amb)}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="#top"><span class="emoji">🦷</span> criaagentes</a>
+  <span class="sep">|</span>
+  <span class="clubpro">
+    <a class="inema" href="https://inema.club" target="_blank" rel="noopener">INEMA.CLUB</a>
+    <span class="sep">-</span>
+    <a class="pro" href="https://inema.pro" target="_blank" rel="noopener">PRO</a>
+  </span>
+  <div class="links">
+    <a class="sec" href="#oque">O que é</a>
+    <a class="sec" href="#fluxo">Como funciona</a>
+    <a class="sec" href="#guia">Guia de uso</a>
+    <a class="sec" href="#exemplos">Exemplos</a>
+    <a class="sec" href="#roadmap">Roadmap</a>
+    <button class="tgl" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">🌙</button>
+    <a class="btn" href="https://github.com/inematds/criaagentes" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</div></nav>
+
+<header class="hero" id="top">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div>
+      <span class="chip">Agentic OS · estudo de caso</span>
+      <h1>Um atendente de WhatsApp que <span class="amb">nunca inventa</span></h1>
+      <p class="lead">O OS completo de uma clínica odontológica, construído camada por camada com a skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a>. Seis pastas, nenhuma linha de código.</p>
+      <div class="cta">
+        <a class="btn" href="#guia">Começar o guia</a>
+        <a class="btn ghost" href="https://github.com/inematds/criaagentes" target="_blank" rel="noopener">Ver no GitHub</a>
+      </div>
+    </div>
+    <div>
+<pre><span class="c"># o OS inteiro é uma pasta</span>
+criaagentes/
+├── <span class="k">CLAUDE.md</span>              <span class="c"># quem ele é</span>
+├── <span class="k">substrate/</span>             <span class="c"># o que ele sabe</span>
+│   ├── compendium.md      <span class="c"># ← a única fonte</span>
+│   ├── sources.md
+│   └── subject-matter-expertise/
+├── <span class="k">rules/</span>                 <span class="c"># o que ele nunca faz</span>
+│   ├── never.md
+│   └── always.md
+├── <span class="k">skills/</span>                <span class="c"># como ele responde</span>
+│   └── responder-duvida-whatsapp/
+├── <span class="k">tools.md</span>               <span class="c"># o que ele alcança</span>
+├── <span class="k">agents/</span>                <span class="c"># quem decide</span>
+│   └── recepcionista-whatsapp/
+├── memory.md              <span class="c"># toda decisão e o porquê</span>
+└── OS-AUDIT.md            <span class="c"># onde ele quebra primeiro</span></pre>
+    </div>
+  </div>
+</header>
+
+<section id="oque"><div class="wrap">
+  <span class="chip">O que é</span>
+  <h2>Um agente de verdade não é um prompt. É uma casa com seis cômodos.</h2>
+  <p class="sub">Este repositório é o estudo de caso completo de um atendente de WhatsApp para a Clínica Sorriso Prime (uma clínica fictícia, usada para demonstração). Ele foi construído inteiro com a skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a> (<code>/os-coach</code>), uma camada por vez, e cada decisão está registrada com o motivo. A maioria das mensagens que chega no WhatsApp de uma clínica é gente nova perguntando preço e horário. É isso que ele resolve.</p>
+  <div class="grid g3">
+    <div class="card"><h3>📌 A regra que sustenta tudo</h3><p>Se não está escrito no compêndio, não existe. O assistente não completa a resposta por conta própria, mesmo quando a resposta parece óbvia. Teste rápido de qualquer resposta: onde é que isso está escrito?</p></div>
+    <div class="card"><h3>🚪 Um portão de saída para humano</h3><p>Dor, sintoma, remédio, desconto, reclamação, urgência ou qualquer coisa fora do compêndio viram alerta no Telegram, com prioridade normal, alta ou urgente. Parar não é o agente falhando, é o agente funcionando.</p></div>
+    <div class="card"><h3>🧾 Cada decisão com o porquê</h3><p>O <code>memory.md</code> guarda as escolhas e o motivo delas. Por que o alerta é no Telegram e não no WhatsApp, por que a agenda é só leitura, por que só existe uma skill. Daqui a três meses, ninguém precisa lembrar.</p></div>
+  </div>
+</div></section>
+
+<section id="fluxo"><div class="wrap">
+  <span class="chip">Como funciona</span>
+  <h2>As seis camadas, nesta ordem</h2>
+  <p class="sub">A ordem não é decorativa. Identidade define o que o substrato precisa cobrir; o substrato alimenta as skills; as skills existem antes do agente que as orquestra. Pular etapa é construir na areia.</p>
+  <div class="flow">
+    <span>Identidade</span><span class="arr">→</span>
+    <span>Substrato</span><span class="arr">→</span>
+    <span>Regras e Hooks</span><span class="arr">→</span>
+    <span>Skills</span><span class="arr">→</span>
+    <span>Ferramentas</span><span class="arr">→</span>
+    <span>Agente</span>
+  </div>
+  <div class="grid g3" style="margin-top:28px">
+    <div class="card"><span class="num">1</span><h3>Identidade · CLAUDE.md</h3><p>26 linhas. Quem ele é, quem ele atende, e quatro recusas testáveis. A mais importante: nunca dizer que tem vaga.</p></div>
+    <div class="card"><span class="num">2</span><h3>Substrato · substrate/</h3><p>A maior camada. O documento oficial da clínica fica como fonte; o <code>compendium.md</code> é o destilado que o atendente lê no dia a dia.</p></div>
+    <div class="card"><span class="num">3</span><h3>Regras · rules/</h3><p>Uma regra é uma placa escrita "não entre". Um hook é uma porta trancada. Aqui existe um hook que importa: o alerta do Telegram dispara sozinho.</p></div>
+    <div class="card"><span class="num">4</span><h3>Skills · skills/</h3><p>Uma só, de propósito. Classificar a mensagem em três caixas: responde sozinho, depende da agenda, ou é de gente.</p></div>
+    <div class="card"><span class="num">5</span><h3>Ferramentas · tools.md</h3><p>Google Agenda somente leitura, e alerta num grupo de Telegram. Uma janela, não a chave da casa. Nenhum segredo mora na pasta.</p></div>
+    <div class="card"><span class="num">6</span><h3>Agente · agents/</h3><p>A skill é a ferramenta, o agente é o cozinheiro. Papel estreito, e um portão de revisão de cinco perguntas antes de qualquer resposta sair.</p></div>
+  </div>
+</div></section>
+
+<section id="pre"><div class="wrap">
+  <span class="chip">Pré-requisitos</span>
+  <h2>O que você precisa para reproduzir isto</h2>
+  <p class="sub">Nada de servidor, build ou dependência. O OS é uma pasta de arquivos de texto. O que faz o trabalho é o Claude Code lendo essa pasta.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Claude Code</h3><p>É onde as camadas são construídas e onde o agente roda.</p><pre><span class="c"># abra na pasta do OS</span>
+<span class="k">cd</span> criaagentes && <span class="k">claude</span></pre></div>
+    <div class="card"><h3>A skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a></h3><p>É ela que faz este projeto existir: guia a construção camada por camada, faz as perguntas e escreve os arquivos. Instale e chame por <code>/os-coach</code>.</p><pre><span class="c"># repo: github.com/inematds/os-agentes</span>
+<span class="k">/os-coach</span> help</pre></div>
+    <div class="card"><h3>O material da sua operação</h3><p>Preço, horário, políticas, as perguntas que mais se repetem. Escrito ou na sua cabeça, os dois servem.</p><pre><span class="c"># vira substrate/compendium.md</span>
+<span class="k">/os-coach</span> layer substrate</pre></div>
+  </div>
+</div></section>
+
+<section id="guia"><div class="wrap">
+  <span class="chip">Guia de uso · passo a passo</span>
+  <h2>Construindo o seu, do zero</h2>
+  <p class="sub">Este OS foi construído exatamente com os comandos abaixo, nesta ordem. Cada comando termina fazendo duas ou três perguntas simples e escrevendo os arquivos da camada.</p>
+
+  <div class="step"><div class="b">1</div><div>
+    <h3>Comece pelo objetivo, em português</h3>
+    <p>Sem jargão. Diga o que você quer que aconteça. O OS Coach cria o <code>memory.md</code> e já entra na camada de Identidade.</p>
+<pre><span class="k">/os-coach</span> start <span class="s">quero criar um agente para atender dúvidas das pessoas na minha clínica usando whatsapp</span>
+<span class="c"># → memory.md + CLAUDE.md</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">2</div><div>
+    <h3>Avance uma camada por vez</h3>
+    <p>Cada <code>next</code> pega a próxima camada inacabada, pergunta só o que falta, e escreve os arquivos. Sem despejo de seis camadas de uma vez.</p>
+<pre><span class="k">/os-coach</span> next   <span class="c"># → substrate/compendium.md + sources.md</span>
+<span class="k">/os-coach</span> next   <span class="c"># → rules/never.md + rules/always.md</span>
+<span class="k">/os-coach</span> next   <span class="c"># → skills/responder-duvida-whatsapp/SKILL.md</span>
+<span class="k">/os-coach</span> next   <span class="c"># → tools.md</span>
+<span class="k">/os-coach</span> next   <span class="c"># → agents/recepcionista-whatsapp/AGENT.md</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">3</div><div>
+    <h3>Entregue o material que você já tem</h3>
+    <p>Se já existe uma tabela de preço, um documento de políticas ou um papel na recepção, aponte o arquivo. O substrato é a maior camada, e é a que mais economiza tempo quando o material já existe.</p>
+<pre><span class="c"># basta apontar o caminho do arquivo na conversa</span>
+<span class="c"># → vira substrate/subject-matter-expertise/ (fonte)</span>
+<span class="c"># → destilado em substrate/compendium.md (o que o agente lê)</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">4</div><div>
+    <h3>Volte numa camada quando quiser</h3>
+    <p>As camadas não são degraus de mão única. Toda vez que uma resposta sai errada, o conserto é no compêndio ou na skill, nunca na cabeça de quem estava de plantão.</p>
+<pre><span class="k">/os-coach</span> layer substrate   <span class="c"># identity | substrate | rules | skills | tools | agents</span>
+<span class="k">/os-coach</span> status           <span class="c"># onde parei?</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">5</div><div>
+    <h3>Audite contra o objetivo, não no abstrato</h3>
+    <p>Dá nota nas seis camadas, aponta onde quebra primeiro, e escreve o resultado em <code>OS-AUDIT.md</code>. Nesta auditoria, duas camadas caíram de nota, e uma delas por um motivo que ninguém tinha visto.</p>
+<pre><span class="k">/os-coach</span> audit
+<span class="c"># → OS-AUDIT.md: scorecard + as 3 jogadas que mais importam</span></pre>
+  </div></div>
+</div></section>
+
+<section id="exemplos"><div class="wrap">
+  <span class="chip">Exemplos</span>
+  <h2>As três caixas, em conversa</h2>
+  <p class="sub">Toda mensagem cai numa das três. E existe uma regra que resolve os casos difíceis: na dúvida sobre a caixa, é sempre a terceira.</p>
+  <div class="grid g3">
+    <div class="chat">
+      <span class="chip">Caixa 1 · responde sozinho</span>
+      <div class="msg" style="margin-top:14px"><span class="who">Paciente</span>Quanto custa a limpeza?</div>
+      <div class="msg bot"><span class="who">Atendente</span>A limpeza simples custa a partir de R$ 180. O valor pode variar conforme a avaliação do dentista.</div>
+      <div class="alert">Está no compêndio, palavra por palavra. Nada a mais.</div>
+    </div>
+    <div class="chat">
+      <span class="chip">Caixa 2 · depende da agenda</span>
+      <div class="msg" style="margin-top:14px"><span class="who">Paciente</span>Tem horário amanhã às 14h?</div>
+      <div class="msg bot"><span class="who">Atendente</span>Vou confirmar na agenda para não te passar um horário errado. Qual é o seu nome completo?</div>
+      <div class="alert">Ver um buraco livre na agenda não é ter consulta marcada. A palavra "confirmada" é da recepção.</div>
+    </div>
+    <div class="chat">
+      <span class="chip">Caixa 3 · é de gente</span>
+      <div class="msg" style="margin-top:14px"><span class="who">Paciente</span>Estou com uma dor muito forte no dente. O que pode ser?</div>
+      <div class="msg bot"><span class="who">Atendente</span>Entendi. Como envolve dor e avaliação clínica, não posso dizer o que pode ser. Vou encaminhar sua mensagem para a equipe da clínica agora.</div>
+      <div class="alert">🚨 Telegram · Prioridade Alta · e o alerta dispara sozinho, não depende de ele lembrar.</div>
+    </div>
+  </div>
+
+  <div class="warn" style="margin-top:26px">
+    <strong>O erro que este OS foi desenhado para impedir.</strong>
+    <p style="margin:.6em 0 0;color:var(--mut)">Não é a resposta feia. É a resposta bonita, simpática, plausível e inventada. Ela passa despercebida justamente porque parece certa. Um preço chutado vira reclamação, um horário chutado vira paciente na porta sem vaga, e uma opinião sobre dor vira risco de saúde. Todos são o mesmo erro de roupa diferente: afirmar como oficial uma coisa que ele não sabe.</p>
+  </div>
+</div></section>
+
+<section id="roadmap"><div class="wrap">
+  <span class="chip">Roadmap</span>
+  <h2>O que está pronto, e o que a auditoria pegou</h2>
+  <p class="sub">As seis camadas estão escritas. A auditoria de 2026-07-15 rebaixou duas, e as duas por motivos honestos. O scorecard completo está em <code>OS-AUDIT.md</code>.</p>
+  <div class="phase"><div class="tag">Pronto</div><div class="d"><strong>As seis camadas, amarradas na mesma ideia</strong><span>Identidade, Regras, Skill e Agente se sustentam mesmo se todo o conteúdo do compêndio for trocado amanhã. Por isso a troca dos dados é trabalho de digitar, não de refazer.</span></div></div>
+  <div class="phase"><div class="tag">Pendente</div><div class="d"><strong>Trocar os dados fictícios pelos reais</strong><span>O compêndio está bem organizado, mas cada valor dele é inventado. Um assistente cuja regra número um é nunca inventar, munido de um livro inteiro de invenções, responde coisas tecnicamente corretas e factualmente falsas.</span></div></div>
+  <div class="phase"><div class="tag">Pendente</div><div class="d"><strong>O WhatsApp não está no arquivo de conexões</strong><span>O objetivo tem a palavra WhatsApp dentro dele, e o tools.md lista Google Agenda e Telegram, mas não o WhatsApp. Ligamos os dois fios auxiliares e esquecemos o cano principal.</span></div></div>
+  <div class="phase"><div class="tag">Pendente</div><div class="d"><strong>Dez conversas de mentira antes de ligar em qualquer coisa</strong><span>Seis camadas escritas, zero mensagens rodadas. Passar dez mensagens reais pelo agente, incluindo as chatas, e perguntar em cada resposta: onde é que isso está escrito?</span></div></div>
+  <div class="phase"><div class="tag">Futuro</div><div class="d"><strong>Fazer o OS melhorar sozinho</strong><span>Nenhuma camada é "composta" ainda: não existe caminho que leve o erro de volta para o compêndio. Se a mesma pergunta aparece três vezes e não está lá, ela deveria entrar sozinha.</span></div></div>
+</div></section>
+
+<footer>
+  <div class="wrap">
+    <div class="pill">Claude Code</div><div class="pill">Markdown</div><div class="pill">Google Agenda</div><div class="pill">Telegram</div>
+    <p style="margin-top:18px">criaagentes · estudo de caso com dados fictícios, para pesquisa e ensino ·
+      <a href="https://github.com/inematds/criaagentes">inematds/criaagentes</a> ·
+      construído com <a href="https://github.com/inematds/os-agentes">inematds/os-agentes</a> ·
+      <a href="https://inema.club">INEMA.CLUB</a></p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var KEY='criaagentes-theme';
+    var b=document.body, t=document.getElementById('themeToggle');
+    if(localStorage.getItem(KEY)==='light'){ b.classList.add('light'); t.textContent='☀️'; }
+    t.addEventListener('click',function(){
+      var light=b.classList.toggle('light');
+      t.textContent=light?'☀️':'🌙';
+      localStorage.setItem(KEY, light?'light':'dark');
+    });
+  })();
+</script>
+</body>
+</html>
