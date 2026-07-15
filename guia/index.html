@@ -156,7 +156,7 @@ criaagentes/
 <section id="oque"><div class="wrap">
   <span class="chip">O que é</span>
   <h2>Um agente de verdade não é um prompt. É uma casa com seis cômodos.</h2>
-  <p class="sub">Este repositório é o estudo de caso completo de um atendente de WhatsApp para a Clínica Sorriso Prime (uma clínica fictícia, usada para demonstração). Ele foi construído inteiro com a skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a> (<code>/os-coach</code>), uma camada por vez, e cada decisão está registrada com o motivo. A maioria das mensagens que chega no WhatsApp de uma clínica é gente nova perguntando preço e horário. É isso que ele resolve.</p>
+  <p class="sub">Este repositório é o estudo de caso completo de um atendente de WhatsApp para a Clínica Sorriso Prime (uma clínica fictícia, usada para demonstração). Ele foi construído inteiro com a skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a> (<code>/os-agentes</code>), uma camada por vez, e cada decisão está registrada com o motivo. A maioria das mensagens que chega no WhatsApp de uma clínica é gente nova perguntando preço e horário. É isso que ele resolve.</p>
   <div class="grid g3">
     <div class="card"><h3>📌 A regra que sustenta tudo</h3><p>Se não está escrito no compêndio, não existe. O assistente não completa a resposta por conta própria, mesmo quando a resposta parece óbvia. Teste rápido de qualquer resposta: onde é que isso está escrito?</p></div>
     <div class="card"><h3>🚪 Um portão de saída para humano</h3><p>Dor, sintoma, remédio, desconto, reclamação, urgência ou qualquer coisa fora do compêndio viram alerta no Telegram, com prioridade normal, alta ou urgente. Parar não é o agente falhando, é o agente funcionando.</p></div>
@@ -193,10 +193,10 @@ criaagentes/
   <div class="grid g3">
     <div class="card"><h3>Claude Code</h3><p>É onde as camadas são construídas e onde o agente roda.</p><pre><span class="c"># abra na pasta do OS</span>
 <span class="k">cd</span> criaagentes && <span class="k">claude</span></pre></div>
-    <div class="card"><h3>A skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a></h3><p>É ela que faz este projeto existir: guia a construção camada por camada, faz as perguntas e escreve os arquivos. Instale e chame por <code>/os-coach</code>.</p><pre><span class="c"># repo: github.com/inematds/os-agentes</span>
-<span class="k">/os-coach</span> help</pre></div>
+    <div class="card"><h3>A skill <a href="https://github.com/inematds/os-agentes" target="_blank" rel="noopener">os-agentes</a></h3><p>É ela que faz este projeto existir: guia a construção camada por camada, faz as perguntas e escreve os arquivos. Instale e chame por <code>/os-agentes</code>.</p><pre><span class="c"># repo: github.com/inematds/os-agentes</span>
+<span class="k">/os-agentes</span> help</pre></div>
     <div class="card"><h3>O material da sua operação</h3><p>Preço, horário, políticas, as perguntas que mais se repetem. Escrito ou na sua cabeça, os dois servem.</p><pre><span class="c"># vira substrate/compendium.md</span>
-<span class="k">/os-coach</span> layer substrate</pre></div>
+<span class="k">/os-agentes</span> layer substrate</pre></div>
   </div>
 </div></section>
 
@@ -208,18 +208,18 @@ criaagentes/
   <div class="step"><div class="b">1</div><div>
     <h3>Comece pelo objetivo, em português</h3>
     <p>Sem jargão. Diga o que você quer que aconteça. O OS Coach cria o <code>memory.md</code> e já entra na camada de Identidade.</p>
-<pre><span class="k">/os-coach</span> start <span class="s">quero criar um agente para atender dúvidas das pessoas na minha clínica usando whatsapp</span>
+<pre><span class="k">/os-agentes</span> start <span class="s">quero criar um agente para atender dúvidas das pessoas na minha clínica usando whatsapp</span>
 <span class="c"># → memory.md + CLAUDE.md</span></pre>
   </div></div>
 
   <div class="step"><div class="b">2</div><div>
     <h3>Avance uma camada por vez</h3>
     <p>Cada <code>next</code> pega a próxima camada inacabada, pergunta só o que falta, e escreve os arquivos. Sem despejo de seis camadas de uma vez.</p>
-<pre><span class="k">/os-coach</span> next   <span class="c"># → substrate/compendium.md + sources.md</span>
-<span class="k">/os-coach</span> next   <span class="c"># → rules/never.md + rules/always.md</span>
-<span class="k">/os-coach</span> next   <span class="c"># → skills/responder-duvida-whatsapp/SKILL.md</span>
-<span class="k">/os-coach</span> next   <span class="c"># → tools.md</span>
-<span class="k">/os-coach</span> next   <span class="c"># → agents/recepcionista-whatsapp/AGENT.md</span></pre>
+<pre><span class="k">/os-agentes</span> next   <span class="c"># → substrate/compendium.md + sources.md</span>
+<span class="k">/os-agentes</span> next   <span class="c"># → rules/never.md + rules/always.md</span>
+<span class="k">/os-agentes</span> next   <span class="c"># → skills/responder-duvida-whatsapp/SKILL.md</span>
+<span class="k">/os-agentes</span> next   <span class="c"># → tools.md</span>
+<span class="k">/os-agentes</span> next   <span class="c"># → agents/recepcionista-whatsapp/AGENT.md</span></pre>
   </div></div>
 
   <div class="step"><div class="b">3</div><div>
@@ -233,14 +233,14 @@ criaagentes/
   <div class="step"><div class="b">4</div><div>
     <h3>Volte numa camada quando quiser</h3>
     <p>As camadas não são degraus de mão única. Toda vez que uma resposta sai errada, o conserto é no compêndio ou na skill, nunca na cabeça de quem estava de plantão.</p>
-<pre><span class="k">/os-coach</span> layer substrate   <span class="c"># identity | substrate | rules | skills | tools | agents</span>
-<span class="k">/os-coach</span> status           <span class="c"># onde parei?</span></pre>
+<pre><span class="k">/os-agentes</span> layer substrate   <span class="c"># identity | substrate | rules | skills | tools | agents</span>
+<span class="k">/os-agentes</span> status           <span class="c"># onde parei?</span></pre>
   </div></div>
 
   <div class="step"><div class="b">5</div><div>
     <h3>Audite contra o objetivo, não no abstrato</h3>
     <p>Dá nota nas seis camadas, aponta onde quebra primeiro, e escreve o resultado em <code>OS-AUDIT.md</code>. Nesta auditoria, duas camadas caíram de nota, e uma delas por um motivo que ninguém tinha visto.</p>
-<pre><span class="k">/os-coach</span> audit
+<pre><span class="k">/os-agentes</span> audit
 <span class="c"># → OS-AUDIT.md: scorecard + as 3 jogadas que mais importam</span></pre>
   </div></div>
 </div></section>
